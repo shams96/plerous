@@ -5,12 +5,12 @@
  * The EHR redirects here after the user authenticates.
  * We exchange the code for tokens via the API, then redirect to /ehr.
  */
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 import { authFetch } from '@/lib/session'
 
-export default function EHROAuthCallbackPage() {
+function EHROAuthCallbackInner() {
   const router      = useRouter()
   const params      = useSearchParams()
   const [status, setStatus] = useState<'exchanging' | 'success' | 'error'>('exchanging')
@@ -94,5 +94,23 @@ export default function EHROAuthCallbackPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function EHROAuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#09090f] flex items-center justify-center p-6">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center space-y-4">
+            <p className="text-[#9B59D3] font-semibold text-sm tracking-wide">Plerous × EHR</p>
+            <Loader2 size={32} className="text-blue-500 animate-spin mx-auto" />
+            <p className="text-sm text-slate-400">Loading…</p>
+          </div>
+        </div>
+      }
+    >
+      <EHROAuthCallbackInner />
+    </Suspense>
   )
 }

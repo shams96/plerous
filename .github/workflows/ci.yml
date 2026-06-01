@@ -58,3 +58,6 @@ jobs:
       - name: Validate Prisma schema
         run: npx prisma validate --schema=src/db/schema.prisma
         working-directory: apps/api
+        env:
+          # Schema parsing resolves env("DATABASE_URL"); value is unused (no DB connection)
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db?schema=public
