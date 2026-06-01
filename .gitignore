@@ -9,6 +9,7 @@ build/
 out/
 .vercel/
 coverage/
+*.tsbuildinfo
 *.log
 .DS_Store
 prisma/migrations/
