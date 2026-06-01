@@ -199,15 +199,17 @@ export default async function LandingPage() {
           </div>
         </div>
 
-        {/* Floating activity cards — desktop only */}
-        <div className="hidden xl:block pointer-events-none absolute inset-0 z-10">
-          <div className="animate-float-a absolute" style={s({ top: '22%', right: '4%' })}>
+        {/* Floating activity cards — only on very wide screens (2xl+) where the
+            centered hero leaves a clear right gutter; hidden below to avoid
+            overlapping the headline/subheadline. */}
+        <div className="hidden 2xl:block pointer-events-none absolute inset-0 z-10">
+          <div className="animate-float-a absolute" style={s({ top: '20%', right: '1.5%' })}>
             <ActivityCard accent="var(--rc-success)" icon="✓" label="PAIA decision" text="auto_submit · 94% confidence" sub="Pulmonology · BCBS TX" />
           </div>
-          <div className="animate-float-b absolute" style={s({ top: '50%', right: '6%' })}>
+          <div className="animate-float-b absolute" style={s({ top: '50%', right: '2.5%' })}>
             <ActivityCard accent="var(--rc-accent)" icon="🛡️" label="Sentinel recovered" text="Referral #RC-2847 re-sent" sub="72h SLA · specialist notified" />
           </div>
-          <div className="animate-float-c absolute" style={s({ bottom: '18%', right: '3%' })}>
+          <div className="animate-float-c absolute" style={s({ bottom: '16%', right: '1%' })}>
             <ActivityCard accent="var(--rc-warning)" icon="$" label="Auth approved" text="BCBS TX · $2,400" sub="Sleep study · auth #TX-994821" />
           </div>
         </div>
