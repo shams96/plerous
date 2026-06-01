@@ -629,8 +629,8 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            {/* Small — HIPAA */}
-            <div className="glass-card grad-border rounded-2xl p-8 flex flex-col justify-between min-h-[200px] reveal delay-1">
+            {/* HIPAA — spans 2 to fill the row after the pricing card moved to the Pricing section */}
+            <div className="glass-card grad-border tilt-card rounded-2xl p-8 md:col-span-2 flex flex-col justify-between min-h-[200px] reveal delay-1">
               <div>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-5" style={s({ background: 'var(--rc-accent-soft)', border: '1px solid var(--rc-border-2)' })}>
                   <ShieldCheck size={16} style={s({ color: 'var(--rc-accent)' })} />
@@ -643,31 +643,6 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            {/* Pricing preview card */}
-            <div
-              className="glass-card grad-border rounded-2xl p-8 flex flex-col justify-between min-h-[200px] reveal delay-2"
-              style={s({ border: '1px solid color-mix(in srgb, var(--rc-accent) 25%, transparent)', background: 'var(--rc-accent-soft)' })}
-            >
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider mb-4" style={s({ color: 'var(--rc-accent)' })}>Starter</p>
-                <p className="text-4xl font-black mb-1 rc-text">$99<span className="text-lg font-medium rc-muted">/mo</span></p>
-                <p className="text-xs rc-muted mb-4">Up to 5 providers · Flat rate · No per-referral fees</p>
-                <ul className="space-y-1.5 text-xs rc-muted">
-                  {['PAIA pre-auth agent', 'NPI onboarding', 'Referral wizard + PAIA', 'Sentinel monitoring'].map(f => (
-                    <li key={f} className="flex items-center gap-1.5">
-                      <CheckCircle2 size={10} style={s({ color: 'var(--rc-accent)' })} className="shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <Link
-                href="/onboarding"
-                className="mt-6 w-full text-center text-xs font-bold text-white py-2.5 rounded-lg transition-colors"
-                style={s({ background: 'var(--rc-accent)' })}
-              >
-                Start free →
-              </Link>
-            </div>
           </div>
         </div>
       </section>
