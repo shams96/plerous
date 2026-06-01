@@ -1,0 +1,518 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Organizations ────────────────────────────────────────────────────────────
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  npi         String   @unique
+  type        OrgType
+  address     Json
+  phone       String
+  email       String
+  faxNumber   String?
+  taxId       String?
+  // EHR Integration
+  ehrSystem   String?   // "epic" | "cerner" | "tebra" | "drchrono" | "athenahealth" | "other"
+  ehrBaseUrl  String?   // FHIR base URL for this org's EHR instance
+  ehrOrgId    String?   // Org ID within their EHR
+  ehrProfileId String?  // Reference to EHR Intelligence Registry profile
+  // Subscription
+  planTier    PlanTier  @default(STARTER)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  providers         Provider[]
+  referralsSent     Referral[]           @relation("SendingOrg")
+  referralsReceived Referral[]           @relation("ReceivingOrg")
+  apiKeys           ApiKey[]
+  ehrConnections    EHRConnection[]
+
+  @@index([npi])
+}
+
+enum OrgType {
+  PCP_PRACTICE
+  SPECIALIST_PRACTICE
+  HOSPITAL
+  FQHC
+  URGENT_CARE
+  TELEHEALTH
+  MULTISPECIALTY
+}
+
+enum PlanTier {
+  STARTER      // $99/mo flat, up to 5 providers
+  PROFESSIONAL // $49/provider/mo, 6-25 providers
+  ENTERPRISE   // custom, 25+ providers
+  API_PARTNER  // EHR white-label
+}
+
+// ─── Providers ────────────────────────────────────────────────────────────────
+model Provider {
+  id                   String   @id @default(uuid())
+  organizationId       String
+  organization         Organization @relation(fields: [organizationId], references: [id])
+  firstName            String
+  lastName             String
+  npi                  String   @unique
+  specialty            String
+  subSpecialty         String?
+  email                String
+  phone                String
+  licenseState         String
+  licenseNumber        String
+  deaNumber            String?
+  acceptingNewPatients Boolean  @default(true)
+  insuranceNetworks    String[] // plan IDs accepted
+  languages            String[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user              User?
+  referralsSent     Referral[] @relation("ReferringProvider")
+  referralsReceived Referral[] @relation("ReceivingProvider")
+
+  @@index([organizationId, specialty])
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+model User {
+  id         String    @id @default(uuid())
+  email      String    @unique
+  password   String
+  role       UserRole
+  providerId String?   @unique
+  provider   Provider? @relation(fields: [providerId], references: [id])
+  firstName  String
+  lastName   String
+  isActive   Boolean   @default(true)
+  lastLogin  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  auditLogs AuditLog[]
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ORG_ADMIN
+  PROVIDER
+  CARE_COORDINATOR
+  BILLING
+  READ_ONLY
+}
+
+// ─── Patients ─────────────────────────────────────────────────────────────────
+model Patient {
+  id                   String   @id @default(uuid())
+  mrn                  String?
+  firstName            String
+  lastName             String
+  dateOfBirth          DateTime
+  gender               String
+  phone                String
+  email                String?
+  address              Json
+  preferredLang        String   @default("en")
+  smsOptIn             Boolean  @default(true)
+  emailOptIn           Boolean  @default(true)
+  // Insurance
+  primaryInsuranceId   String?
+  primaryInsurance     InsurancePlan? @relation("PrimaryInsurance", fields: [primaryInsuranceId], references: [id])
+  insuranceMemberId    String?
+  insuranceGroupNumber String?
+  // EHR linkage
+  externalPatientId    String?  // ID in referring provider's EHR
+  fhirPatientId        String?  // FHIR Patient resource ID
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  referrals Referral[]
+
+  @@index([insuranceMemberId])
+  @@index([mrn])
+}
+
+// ─── Insurance Plans ──────────────────────────────────────────────────────────
+model InsurancePlan {
+  id               String   @id @default(uuid())
+  payerId          String
+  payer            Payer    @relation(fields: [payerId], references: [id])
+  planName         String
+  planType         PlanType
+  groupNumber      String?
+  requiresReferral Boolean  @default(true)
+  requiresPriorAuth Boolean @default(false)
+  networkTier      String?
+  // Auth rules cache (refreshed by Auth Rules Engine agent)
+  authRulesJson    Json?
+  authRulesUpdatedAt DateTime?
+
+  patients  Patient[]  @relation("PrimaryInsurance")
+  referrals Referral[]
+
+  @@index([payerId])
+}
+
+enum PlanType {
+  HMO
+  PPO
+  EPO
+  POS
+  HDHP
+  MEDICARE_ADVANTAGE
+  MEDICAID
+  CHIP
+}
+
+// ─── Payers ───────────────────────────────────────────────────────────────────
+model Payer {
+  id                      String   @id @default(uuid())
+  name                    String
+  tradingPartnerServiceId String   @unique
+  fhirBaseUrl             String?
+  apiType                 String   // "fhir_r4" | "edi_x12" | "proprietary"
+  authEndpoint            String?
+  clientId                String?
+  requiresFax             Boolean  @default(false)
+  isActive                Boolean  @default(true)
+  createdAt               DateTime @default(now())
+
+  plans          InsurancePlan[]
+  authorizations PriorAuthorization[]
+  policyRules    PolicyRule[]
+}
+
+// ─── REFERRALS (Core Entity) ──────────────────────────────────────────────────
+model Referral {
+  id             String @id @default(uuid())
+  referralNumber String @unique @default(cuid())
+
+  // Parties
+  sendingOrgId        String
+  sendingOrg          Organization  @relation("SendingOrg", fields: [sendingOrgId], references: [id])
+  receivingOrgId      String?
+  receivingOrg        Organization? @relation("ReceivingOrg", fields: [receivingOrgId], references: [id])
+  referringProviderId String
+  referringProvider   Provider      @relation("ReferringProvider", fields: [referringProviderId], references: [id])
+  receivingProviderId String?
+  receivingProvider   Provider?     @relation("ReceivingProvider", fields: [receivingProviderId], references: [id])
+  patientId           String
+  patient             Patient       @relation(fields: [patientId], references: [id])
+  insurancePlanId     String?
+  insurancePlan       InsurancePlan? @relation(fields: [insurancePlanId], references: [id])
+
+  // Clinical
+  specialty       String
+  subSpecialty    String?
+  diagnosisCodes  String[]
+  procedureCodes  String[]
+  clinicalNotes   String?
+  urgency         Urgency        @default(ROUTINE)
+  reason          String
+
+  // Status machine
+  status        ReferralStatus @default(DRAFT)
+  statusHistory Json[]         @default([])
+
+  // Authorization
+  requiresAuth    Boolean            @default(false)
+  authorizationId String?
+  authorization   PriorAuthorization? @relation(fields: [authorizationId], references: [id])
+
+  // Scheduling
+  requestedDate        DateTime?
+  appointmentDate      DateTime?
+  appointmentConfirmed Boolean   @default(false)
+
+  // AI Scores (computed on create, refreshed on status change)
+  riskScore           Float?  // 0-100
+  approvalProbability Float?  // 0-100
+  leakageRisk         String? // "low" | "medium" | "high"
+
+  // Revenue tracking
+  estimatedRevenue Float?
+  actualRevenue    Float?
+
+  // Source & traceability
+  source               String  @default("portal") // "portal" | "api" | "ehr_sync" | "fax"
+  externalId           String? // ID in originating EHR
+  fhirServiceRequestId String?
+  ehrSystemId          String? // which EHR this came from
+
+  // FedEx tracking — public token for patient status page (no auth required)
+  trackingToken        String? @unique  // e.g. "RC-A3F7K2" — shared with patient at submit
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+  paiaAnalyses   PAIAAnalysis[]
+
+  @@index([sendingOrgId, status])
+  @@index([patientId])
+  @@index([referralNumber])
+}
+
+enum ReferralStatus {
+  DRAFT
+  PAIA_REVIEW    // Blocked by PAIA — human input needed before submission
+  SUBMITTED
+  RECEIVED       // Specialist acknowledged — the "FedEx delivered" moment
+  AUTH_PENDING
+  AUTH_APPROVED
+  AUTH_DENIED
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+  NO_SHOW
+}
+
+enum Urgency {
+  ROUTINE
+  URGENT
+  STAT
+  EMERGENCY
+}
+
+// ─── Prior Authorization ──────────────────────────────────────────────────────
+model PriorAuthorization {
+  id             String     @id @default(uuid())
+  payerId        String
+  payer          Payer      @relation(fields: [payerId], references: [id])
+  authNumber     String?
+  status         AuthStatus @default(PENDING)
+  submittedAt    DateTime?
+  determinedAt   DateTime?
+  expiresAt      DateTime?
+  requestedCodes String[]
+  approvedCodes  String[]
+  denialReason   String?
+  denialCode     String?
+  appealDeadline DateTime?
+  appealText     String?    // AI-generated appeal letter
+  appealSubmitted Boolean   @default(false)
+  urgency        String     @default("standard")
+  rawResponse    Json?
+  fhirClaimId    String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  referrals Referral[]
+
+  @@index([authNumber])
+  @@index([payerId, status])
+}
+
+enum AuthStatus {
+  PENDING
+  SUBMITTED
+  IN_REVIEW
+  APPROVED
+  PARTIALLY_APPROVED
+  DENIED
+  EXPIRED
+  APPEALED
+  APPEAL_APPROVED
+  APPEAL_DENIED
+  NOT_REQUIRED
+}
+
+// ─── EHR Connections (managed by EIR) ────────────────────────────────────────
+model EHRConnection {
+  id             String   @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  ehrSystemId    String   // "epic-2025-1", "cerner-millennium", etc.
+  displayName    String
+  fhirBaseUrl    String
+  apiType        String
+  // SMART on FHIR OAuth
+  smartState     String?  // CSRF state param during OAuth flow
+  smartClientId  String?  // app client_id registered with this EHR
+  smartTokenUrl  String?  // token endpoint discovered from .well-known/smart-configuration
+  smartScope     String?  // scopes granted
+  // OAuth tokens (encrypted at rest)
+  accessToken    String?  // encrypted
+  refreshToken   String?  // encrypted
+  tokenExpiresAt DateTime?
+  // EIR metadata
+  profileVersion String?
+  discoveredAt   DateTime?
+  confidenceScore Float?
+  lastSyncAt     DateTime?
+  syncStatus     String   @default("pending") // "active" | "error" | "pending"
+  syncError      String?
+  capabilities   Json?    // cached CapabilityStatement summary
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, fhirBaseUrl])
+  @@index([organizationId])
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+model Notification {
+  id         String       @id @default(uuid())
+  referralId String
+  referral   Referral     @relation(fields: [referralId], references: [id])
+  type       NotifType
+  channel    NotifChannel
+  recipient  String
+  message    String
+  status     String       @default("pending")
+  externalId String?
+  sentAt     DateTime?
+  createdAt  DateTime     @default(now())
+
+  @@index([referralId])
+}
+
+enum NotifType {
+  // Patient lifecycle events
+  REFERRAL_CREATED
+  AUTH_SUBMITTED
+  AUTH_APPROVED
+  AUTH_DENIED
+  APPOINTMENT_REMINDER
+  APPOINTMENT_CONFIRMED
+  REFERRAL_COMPLETED
+  REFERRAL_CANCELLED
+  // Sentinel alert types
+  AUTH_EXPIRING
+  STALE_DRAFT
+  STALE_PAIA_REVIEW
+  AUTH_STUCK
+  SPECIALIST_NO_ACK    // 72h SLA — submitted but specialist hasn't acknowledged
+  REFERRAL_STALLED     // Generic stall for auto-recovery escalation
+}
+
+enum NotifChannel {
+  SMS
+  EMAIL
+  PUSH
+  WEBHOOK
+  INTERNAL             // Sentinel internal alerts with no external delivery
+}
+
+// ─── API Keys (EHR white-label access) ───────────────────────────────────────
+model ApiKey {
+  id             String   @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  keyHash        String   @unique
+  keyPrefix      String   // first 8 chars shown to user
+  scopes         String[]
+  isActive       Boolean  @default(true)
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+  createdAt      DateTime @default(now())
+
+  @@index([keyHash])
+}
+
+// ─── Policy Rules (payer auth rules — admin-editable, replaces hardcoded JS) ──
+model PolicyRule {
+  id          String   @id @default(uuid())
+  payerId     String?
+  payer       Payer?   @relation(fields: [payerId], references: [id])
+  // null payerId = universal default rule
+  cptCode     String   // procedure code this rule applies to
+  paRequired  Boolean  @default(true)
+  criteria    Json     // { required: [...], preferred: [...], autoExtractable: [...] }
+  denialRateBaseline Float?
+  denialCount        Int    @default(0)  // lifetime denials for this rule
+  submissionCount    Int    @default(0)  // lifetime submissions for this rule
+  stepTherapy Json?    // { required: true, drugs: [...] } for biologics
+  notes       String?
+  sourceUrl   String?  // CMS LCD/NCD URL, payer portal URL
+  sourceName  String?  // "CMS LCD L33212", "BCBS TX MP-1.01.516"
+  effectiveDate DateTime?
+  expiresAt   DateTime?
+  isActive    Boolean  @default(true)
+  createdBy   String?  // userId or "system:crawler"
+  updatedBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([payerId, cptCode])
+  @@index([cptCode])
+  @@index([payerId])
+}
+
+// ─── PAIA Analysis Results (persistent — was Redis-only) ─────────────────────
+model PAIAAnalysis {
+  id                 String   @id @default(uuid())
+  referralId         String
+  referral           Referral @relation(fields: [referralId], references: [id])
+  decision           String   // "auto_submit" | "human_window" | "pa_not_required" | "hard_stop"
+  confidence         Float
+  denialProbability  Float
+  humanWindowItems   Json     @default("[]")
+  autoFixed          Json     @default("[]")
+  checksRun          Json     @default("[]")
+  payerRulesVersion  String?
+  auditHash          String?  // chained SHA-256 for tamper-evidence
+  analyzedInMs       Int?
+  resolvedAt         DateTime?
+  resolvedBy         String?  // userId
+  resolutionNote     String?
+  resolution         String?  // "confirmed" | "override"
+  createdAt          DateTime @default(now())
+
+  @@index([referralId])
+  @@index([decision])
+  @@index([createdAt])
+}
+
+// ─── Admin Actions (manual interventions — every click logged) ────────────────
+model AdminAction {
+  id         String   @id @default(uuid())
+  adminId    String
+  action     String   // "OVERRIDE_PAIA" | "EDIT_POLICY_RULE" | "FORCE_SUBMIT" | "UNLOCK_REFERRAL"
+  targetType String   // "referral" | "policy_rule" | "organization" | "payer"
+  targetId   String
+  before     Json?    // state before change
+  after      Json?    // state after change
+  reason     String?  // required for overrides
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+// ─── Audit Log (HIPAA-required) ───────────────────────────────────────────────
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  referralId String?
+  referral   Referral? @relation(fields: [referralId], references: [id])
+  action     String   // "CREATE_REFERRAL" | "VIEW_PATIENT" | "SUBMIT_AUTH" etc.
+  resource   String
+  resourceId String
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([referralId])
+  @@index([userId])
+  @@index([createdAt])
+}

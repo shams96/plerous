@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+.turbo/
+dist/
+build/
+.next/
+out/
+.vercel/
+coverage/
+*.log
+.DS_Store
+prisma/migrations/
+*.pem
+*.key
