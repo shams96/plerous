@@ -47,8 +47,7 @@ export default function DailyBrief() {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
-    authFetch('/api/proxy/v1/agents/brief/coordinator')
-      .then(r => r.json())
+    authFetch<{ success: boolean; data: Brief }>('/api/proxy/v1/agents/brief/coordinator')
       .then(r => { if (r.success) setBrief(r.data) })
       .catch(() => {})
       .finally(() => setLoading(false))

@@ -48,7 +48,6 @@ async function handler(
       method: req.method,
       headers,
       body,
-      // @ts-expect-error — Next.js node runtime
       signal: AbortSignal.timeout(30_000),
     })
 
