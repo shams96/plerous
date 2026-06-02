@@ -61,3 +61,51 @@ jobs:
         env:
           # Schema parsing resolves env("DATABASE_URL"); value is unused (no DB connection)
           DATABASE_URL: postgresql://user:pass@localhost:5432/db?schema=public
+
+  e2e:
+    name: E2E — payer loop vs simulator
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: plerous
+          POSTGRES_PASSWORD: plerous_ci
+          POSTGRES_DB: plerous_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U plerous"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DATABASE_URL: postgresql://plerous:plerous_ci@localhost:5432/plerous_test?schema=public
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-test-jwt-secret-min-32-chars-long-xxxx
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate --schema=src/db/schema.prisma
+        working-directory: apps/api
+
+      - name: Push schema to test DB
+        run: npx prisma db push --schema=src/db/schema.prisma --skip-generate
+        working-directory: apps/api
+
+      - name: Run E2E suite (boots simulator + webhook API automatically)
+        run: npm test
+        working-directory: apps/api
