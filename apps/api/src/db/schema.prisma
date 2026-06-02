@@ -180,9 +180,11 @@ model Payer {
   name                    String
   tradingPartnerServiceId String   @unique
   fhirBaseUrl             String?
-  apiType                 String   // "fhir_r4" | "edi_x12" | "proprietary"
-  authEndpoint            String?
+  apiType                 String   // "fhir_r4" | "edi_x12" | "availity" | "proprietary"
+  authEndpoint            String?  // OAuth2 token URL (client-credentials)
   clientId                String?
+  clientSecret            String?  // OAuth2 client secret (sandbox/live)
+  scope                   String?  // optional OAuth scope
   requiresFax             Boolean  @default(false)
   isActive                Boolean  @default(true)
   createdAt               DateTime @default(now())
@@ -223,6 +225,10 @@ model Referral {
   // Status machine
   status        ReferralStatus @default(DRAFT)
   statusHistory Json[]         @default([])
+
+  // Delivery / receipt confirmation (specialist side)
+  deliveredAt     DateTime?  // when transmitted to the specialist channel
+  acknowledgedAt  DateTime?  // when the specialist confirmed receipt (secure link / Direct MDN / FHIR Task)
 
   // Authorization
   requiresAuth    Boolean            @default(false)

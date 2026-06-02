@@ -71,7 +71,26 @@ async function main() {
     },
   })
 
-  console.log('✅ Payers created (UHC, Kaiser, BCBS, Aetna)')
+  // Partner simulator payer — points at the local payer-sim for end-to-end
+  // testing without live partner access. Flip fhirBaseUrl/authEndpoint to the
+  // UHC/Availity sandbox once credentials arrive (same code path).
+  const sim = await prisma.payer.upsert({
+    where: { tradingPartnerServiceId: 'SIM-0001' },
+    update: {
+      fhirBaseUrl: process.env.PAYER_SIM_URL || 'http://localhost:4010/fhir/r4',
+      authEndpoint: (process.env.PAYER_SIM_BASE || 'http://localhost:4010') + '/oauth/token',
+    },
+    create: {
+      name: 'Plerous Simulator',
+      tradingPartnerServiceId: 'SIM-0001',
+      fhirBaseUrl: process.env.PAYER_SIM_URL || 'http://localhost:4010/fhir/r4',
+      apiType: 'fhir_r4',
+      authEndpoint: (process.env.PAYER_SIM_BASE || 'http://localhost:4010') + '/oauth/token',
+      requiresFax: false,
+    },
+  })
+
+  console.log('✅ Payers created (UHC, Kaiser, BCBS, Aetna, Simulator)')
 
   // ── Insurance Plans ────────────────────────────────────────────────────────
   const uhcHmo = await prisma.insurancePlan.create({
