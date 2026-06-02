@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { lookupNPI, searchNPPES } from '../../lib/nppes.js'
 import { inferEHRFromNPI } from '../../ehr/eir.service.js'
 import { prisma } from '../../db/client.js'
+import { validatePasswordStrength } from '../../middleware/password-validator.js'
+import { AppError } from '../../middleware/error-handler.js'
 
 const npiSchema = z.object({
   npi: z.string().regex(/^\d{10}$/, 'NPI must be exactly 10 digits'),
@@ -103,6 +105,10 @@ export default async function onboardingRoutes(app) {
     },
   }, async (req, reply) => {
     const { npi, email, password, overrides } = req.body
+
+    // Enforce password strength before any DB work
+    const strength = validatePasswordStrength(password)
+    if (!strength.valid) throw new AppError(400, strength.reason)
 
     // Fetch current NPPES data
     const profile = await lookupNPI(npi)
