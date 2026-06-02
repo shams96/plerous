@@ -24,6 +24,7 @@ import adminRoutes from './modules/admin/admin.routes.js'
 import agentRoutes from './modules/agents/brief.routes.js'
 import { startSentinel } from './workers/sentinel.worker.js'
 import { startSla } from './workers/sla.worker.js'
+import './events/subscribers.js' // registers Intelligence + Growth event subscribers
 
 export async function buildApp() {
   const app = Fastify({
