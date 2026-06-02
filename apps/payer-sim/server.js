@@ -186,6 +186,20 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, eligibilityResponse(memberId))
     }
 
+    // Fax send (off-network specialist delivery). Deterministic by fax number:
+    //   "LOST*" → transmission fails (the lost-fax scenario), else transmitted.
+    if (req.method === 'POST' && path === '/fax/send') {
+      const raw = await readBody(req)
+      const body = raw ? JSON.parse(raw) : {}
+      const to = String(body.to || '')
+      const lost = to.toUpperCase().includes('LOST')
+      return json(res, 200, {
+        status: lost ? 'failed' : 'transmitted',
+        sid: 'FAX-' + randomUUID().slice(0, 8).toUpperCase(),
+        pages: lost ? 0 : Math.max(1, Math.ceil((body.content?.length || 200) / 1800)),
+      })
+    }
+
     // X12 278 (EDI fallback) — return JSON for convenience
     if (req.method === 'POST' && path === '/edi/278') {
       const raw = await readBody(req)

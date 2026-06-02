@@ -41,6 +41,11 @@ export const config = {
     },
   },
 
+  // Outbound/inbound fax provider (Phaxio/Documo/Twilio Fax in prod; sim in dev/test)
+  fax: {
+    providerUrl: process.env.FAX_PROVIDER_URL || 'http://localhost:4010',
+  },
+
   encryption: { key: process.env.ENCRYPTION_KEY },
 
   eir: {

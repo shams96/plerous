@@ -199,13 +199,14 @@ model Referral {
   id             String @id @default(uuid())
   referralNumber String @unique @default(cuid())
 
-  // Parties
-  sendingOrgId        String
-  sendingOrg          Organization  @relation("SendingOrg", fields: [sendingOrgId], references: [id])
+  // Parties — sending side is nullable: an INBOUND referral arrives from an
+  // off-network PCP (captured in source* fields below), with no on-network sender.
+  sendingOrgId        String?
+  sendingOrg          Organization? @relation("SendingOrg", fields: [sendingOrgId], references: [id])
   receivingOrgId      String?
   receivingOrg        Organization? @relation("ReceivingOrg", fields: [receivingOrgId], references: [id])
-  referringProviderId String
-  referringProvider   Provider      @relation("ReferringProvider", fields: [referringProviderId], references: [id])
+  referringProviderId String?
+  referringProvider   Provider?     @relation("ReferringProvider", fields: [referringProviderId], references: [id])
   receivingProviderId String?
   receivingProvider   Provider?     @relation("ReceivingProvider", fields: [receivingProviderId], references: [id])
   patientId           String
@@ -225,6 +226,20 @@ model Referral {
   // Status machine
   status        ReferralStatus @default(DRAFT)
   statusHistory Json[]         @default([])
+
+  // Intended receiver when NOT an on-network provider/org (off-network specialist).
+  // Drives the DeliveryGateway channel choice + the growth (prospect) loop.
+  targetNpi       String?
+  targetName      String?
+  targetSpecialty String?
+  targetFax       String?
+  targetState     String?
+
+  // External SENDER when this referral was ingested from outside (inbound fax /
+  // Direct / EHR). Feeds the growth loop (the outside PCP is a prospect).
+  sourceNpi       String?
+  sourceName      String?
+  sourceFax       String?
 
   // Delivery / receipt confirmation (specialist side)
   deliveredAt     DateTime?  // when transmitted to the specialist channel
@@ -265,6 +280,7 @@ model Referral {
   notifications  Notification[]
   auditLogs      AuditLog[]
   paiaAnalyses   PAIAAnalysis[]
+  deliveries     Delivery[]
 
   @@index([sendingOrgId, status])
   @@index([patientId])
@@ -411,7 +427,93 @@ enum NotifChannel {
   EMAIL
   PUSH
   WEBHOOK
+  FAX                  // outbound fax to off-network specialists (transmit-only proof)
   INTERNAL             // Sentinel internal alerts with no external delivery
+}
+
+// ─── Prospects (growth loop) ──────────────────────────────────────────────────
+// Off-network parties Plerous touches (a specialist we faxed, a PCP whose fax we
+// received) become qualified reach-out candidates, researched by the ProspectAgent.
+model Prospect {
+  id            String   @id @default(uuid())
+  npi           String?
+  name          String?
+  specialty     String?
+  faxNumber     String?
+  phone         String?
+  email         String?
+  state         String?
+  // Why they're a candidate
+  source        String   // "outbound_referral" | "inbound_fax" | "manual"
+  triggerRef    String?  // referralId that surfaced them
+  status        String   @default("new") // "new" | "researched" | "contacted" | "converted" | "dismissed"
+  // ProspectAgent output (economics + outreach draft)
+  research      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([npi, source])
+  @@index([status])
+}
+
+// ─── Deliveries (DeliveryGateway — how a referral reached the specialist) ──────
+// One row per delivery attempt. "Confirmed receipt" is a per-channel property:
+// each channel reports the strongest proof it can (in_app=queued, secure_link=
+// click, fax=transmit only, direct=MDN, ehr_fhir=Task status).
+model Delivery {
+  id            String   @id @default(uuid())
+  referralId    String
+  referral      Referral @relation(fields: [referralId], references: [id])
+  channel       String   // "in_app" | "secure_link" | "fax" | "direct" | "ehr_fhir"
+  status        String   @default("pending") // "pending" | "transmitted" | "delivered" | "confirmed" | "failed"
+  toAddress     String?  // fax number, Direct address, FHIR endpoint, or org id
+  externalId    String?  // provider transmission id (fax SID, MDN id)
+  proof         Json?    // channel-specific evidence (pages, MDN, Task ref)
+  transmittedAt DateTime?
+  confirmedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([referralId])
+  @@index([status])
+}
+
+// ─── Referral Intelligence (the moat: event-sourced outcome graph) ────────────
+// Append-only log of domain events. The replayable source of truth that all
+// intelligence/aggregates derive from. Tenant-scoped for isolation; global
+// learning reads only de-identified aggregates (ProviderStat), never this PHI-
+// adjacent log across tenants.
+model ReferralEvent {
+  id          String   @id @default(uuid())
+  referralId  String?
+  type        String   // domain event type, e.g. "referral.delivered"
+  payload     Json
+  tenantOrgId String?  // sending org — tenant isolation key
+  createdAt   DateTime @default(now())
+
+  @@index([referralId])
+  @@index([type])
+  @@index([tenantOrgId, createdAt])
+}
+
+// De-identified rolling performance per specialist (the genuinely-new moat data;
+// payer denial intelligence already lives in PolicyRule). NO patient data —
+// counts + timing sums only, safe to learn across the whole network.
+model ProviderStat {
+  id                String   @id @default(uuid())
+  npi               String   @unique // the specialist (may be off-network)
+  specialty         String?
+  state             String?
+  referralsReceived Int      @default(0)
+  acknowledged      Int      @default(0)
+  scheduled         Int      @default(0)
+  completed         Int      @default(0)
+  // Sums to derive averages (Float to avoid 32-bit overflow on ms sums)
+  ackTimeSumMs      Float    @default(0)
+  ackTimeCount      Int      @default(0)
+  updatedAt         DateTime @updatedAt
+
+  @@index([specialty, state])
 }
 
 // ─── API Keys (EHR white-label access) ───────────────────────────────────────
