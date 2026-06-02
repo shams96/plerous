@@ -5,13 +5,14 @@
  */
 import { on } from './bus.js'
 import { handleEvent as intelligence } from '../intelligence/intelligence.subscriber.js'
+import { handleEvent as growth } from '../growth/growth.subscriber.js'
 
 let registered = false
 export function registerSubscribers() {
   if (registered) return
   registered = true
   on('*', 'intelligence', intelligence) // Referral Intelligence (the moat)
-  // Growth subscriber registered in its own module (Module 3).
+  on('*', 'growth', growth)             // Growth / prospect engine
 }
 
 registerSubscribers()
