@@ -5,6 +5,8 @@ import { PriorAuthService } from '../auth/auth.service.js'
 import { NotifyService } from '../notifications/notify.service.js'
 import { prisma as db } from '../../db/client.js'
 import { paia } from '../../agents/paia.agent.js'
+import { deliveryGateway } from '../../delivery/delivery-gateway.js'
+import { emitDomainEvent } from '../../events/bus.js'
 
 const ai = new AIService()
 const authSvc = new PriorAuthService()
@@ -152,6 +154,12 @@ export class ReferralService {
 
     await updateStatus(id, 'SUBMITTED', user, 'Referral submitted to specialist')
 
+    // ── Deliver to the receiving specialist via the DeliveryGateway ──────────
+    // Picks the channel (in_app / fax / secure_link) by party resolution,
+    // records a Delivery row, and emits events that feed Intelligence + Growth.
+    await deliveryGateway.deliver({ ...referral, trackingToken })
+      .catch((err) => console.warn(`[Referral] delivery warning for ${id}: ${err.message}`))
+
     if (referral.requiresAuth) {
       await updateStatus(id, 'AUTH_PENDING', user, 'Prior authorization initiated')
       await authSvc.submit({
@@ -211,6 +219,12 @@ export class ReferralService {
     )
 
     await notify.scheduleReminder(updated, new Date(appointmentDate))
+    await emitDomainEvent('referral.scheduled', {
+      referralId: id,
+      tenantOrgId: updated.sendingOrgId,
+      specialistNpi: updated.receivingProvider?.npi ?? updated.targetNpi ?? null,
+      specialty: updated.specialty,
+    })
     await audit(user.id, 'SCHEDULE_REFERRAL', id, { appointmentDate })
     return updated
   }
@@ -387,6 +401,16 @@ export class ReferralService {
         referral.id, 'REFERRAL_CREATED',
       ).catch(() => {})
     }
+
+    const specialistNpi = referral.receivingProvider?.npi ?? referral.targetNpi ?? null
+    const ackMs = now - new Date(referral.deliveredAt ?? referral.createdAt).getTime()
+    await emitDomainEvent('referral.acknowledged', {
+      referralId: referral.id,
+      tenantOrgId: referral.sendingOrgId,
+      specialistNpi,
+      specialty: referral.specialty,
+      ackMs: ackMs > 0 ? ackMs : null,
+    })
 
     return { acknowledged: true, status: 'RECEIVED', acknowledgedAt: now }
   }
