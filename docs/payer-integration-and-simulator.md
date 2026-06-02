@@ -81,16 +81,19 @@ This lets automated tests force any path precisely.
 - The actual **Availity** endpoint — adapter delegates to FHIR PAS. **Gap: Availity's real OAuth host, `x-availity-customer-id` header, and submission envelope if it diverges from plain FHIR `$submit`.**
 - Eligibility benefit detail (copay/deductible/OOP) — sim returns coverage flags only; real 271 has richer detail we don't yet parse.
 
-### ❌ Still stub / missing (gaps to fill)
+### ✅ Now closed (built on this branch, verified by the E2E suite)
+- **Specialist secure-link "confirmed receipt"** — `POST /v1/referrals/track/:token/acknowledge` (public, no login) flips `SUBMITTED → RECEIVED`, stamps `acknowledgedAt`/`deliveredAt`, notifies the patient. Idempotent. Makes "confirmed receipt" honest for the fax/secure-link channel. (tests: `delivery.e2e.test.js`)
+- **Automated SLA / expiry transitions** — `src/workers/sla.worker.js` (hourly) flips lapsed `APPROVED` auths to `EXPIRED` and the referral with them, unless already SCHEDULED/COMPLETED. (tests: `sla.e2e.test.js`)
+- **Automated E2E test suite** — Vitest, 14 scenarios green: sync approve/deny, poll, signed webhook, eligibility, denial-feedback, secure-link receipt, SLA expiry, webhook HMAC (reject/accept). Runs in CI against postgres+redis with the simulator auto-booted.
+
+### ❌ Still stub / missing (remaining gaps)
 1. **Real partner credentials & endpoints** — UHC sandbox (Wed) and Availity. Highest priority; everything else is ready for them.
 2. **Availity-specific adapter** — auth host, customer-id header, and any non-FHIR envelope. Seam exists, body is TODO until we have their docs.
 3. **X12 278/275 full compliance** — current generator is structurally valid but NOT certified (no HIPAA companion-guide validation, no 275 attachments, no SNIP levels). Fine for the EDI fallback path against the sim; needs a real X12 library + payer companion guides for production EDI.
 4. **270/271 eligibility over X12** — not implemented (FHIR eligibility only).
-5. **Specialist-side "confirmed receipt"** — the secure-link acknowledgment (turning the existing `track/[token]` page into a real RECEIVED signal), Direct Secure Messaging (MDN), and EHR FHIR `Task` polling. Until these ship, "confirmed receipt" is honest only for the payer/FHIR path, not the fax/secure-link channel.
-6. **Automated SLA / expiry transitions** — a worker to flip `AUTH_APPROVED → EXPIRED` past `expiresAt`. (Sentinel already chases `SPECIALIST_NO_ACK` at 72h.)
-7. **`validDiagnoses` enforcement** — procedure↔diagnosis check is advisory; the allowed-diagnosis list isn't persisted to `PolicyRule` yet.
-8. **Automated E2E test suite** — in progress (Vitest) to lock all of the above behind green checks before any marketing claim ships.
-9. **Webhook raw-body for arbitrary payers** — we verify HMAC over re-serialized JSON, which is deterministic for our simulator; real payers signing raw bytes need a raw-body capture (noted in `auth.routes.js`).
+5. **Direct Secure Messaging (MDN) + EHR FHIR `Task` polling** — the other two "confirmed receipt" channels beyond the secure link.
+6. **`validDiagnoses` enforcement** — procedure↔diagnosis check is advisory; the allowed-diagnosis list isn't persisted to `PolicyRule` yet.
+7. **Webhook raw-body for arbitrary payers** — we verify HMAC over re-serialized JSON, which is deterministic for our simulator; real payers signing raw bytes need a raw-body capture (noted in `auth.routes.js`).
 
 ---
 

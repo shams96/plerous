@@ -79,6 +79,23 @@ export default async function referralRoutes(app) {
     reply.send({ success: true, data })
   })
 
+  /**
+   * POST /v1/referrals/track/:token/acknowledge
+   * Public specialist receipt confirmation via the secure link — no auth.
+   * Turns the tracking page into a real "confirmed receipt" signal for the
+   * fax / secure-link channel (SUBMITTED → RECEIVED).
+   */
+  app.post('/track/:token/acknowledge', {
+    schema: {
+      tags: ['Referrals'],
+      summary: 'Specialist confirms receipt via secure link (no auth)',
+      params: { type: 'object', properties: { token: { type: 'string' } } },
+    },
+  }, async (req, reply) => {
+    const result = await svc.acknowledgeByToken(req.params.token)
+    reply.send({ success: true, data: result })
+  })
+
   app.post('/:id/schedule', {
     preHandler: [authenticate],
     schema: { tags: ['Referrals'], summary: 'Confirm appointment + send patient SMS', body: scheduleBody },

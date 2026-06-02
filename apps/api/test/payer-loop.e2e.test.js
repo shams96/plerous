@@ -8,8 +8,8 @@
  * Requires: Postgres + Redis up, and global-setup's simulator (:4011) +
  * webhook API (:3091) running.
  */
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { prisma, redis } from '../src/db/client.js'
+import { describe, it, expect } from 'vitest'
+import { prisma } from '../src/db/client.js'
 import { PriorAuthService } from '../src/modules/auth/auth.service.js'
 import { pollAuthOnce } from '../src/workers/auth-poller.worker.js'
 import { makeReferral, waitFor } from './helpers/fixtures.js'
@@ -119,8 +119,4 @@ describe('Payer prior-auth loop (real gateway → simulator)', () => {
     expect(rule.submissionCount).toBeGreaterThan(0)
   })
 
-  afterAll(async () => {
-    await prisma.$disconnect().catch(() => {})
-    await redis.quit().catch(() => {})
-  })
 })

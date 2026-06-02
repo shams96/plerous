@@ -23,6 +23,7 @@ import sessionRoutes from './modules/session/session.routes.js'
 import adminRoutes from './modules/admin/admin.routes.js'
 import agentRoutes from './modules/agents/brief.routes.js'
 import { startSentinel } from './workers/sentinel.worker.js'
+import { startSla } from './workers/sla.worker.js'
 
 export async function buildApp() {
   const app = Fastify({
@@ -156,6 +157,7 @@ export async function start() {
   const app = await buildApp()
   await app.listen({ port: config.port, host: '0.0.0.0' })
   await startSentinel()
+  await startSla()
   console.log(`
 ╔══════════════════════════════════════════════════╗
 ║  ⚡ Plerous API — Phase 1                       ║
