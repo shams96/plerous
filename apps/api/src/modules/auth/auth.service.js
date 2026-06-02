@@ -36,9 +36,13 @@ export class PriorAuthService {
     try {
       const result = await payerGateway.submitAuth({ auth: { ...auth, referrals: [{ id: referralId }] }, payer })
 
-      // Persist the FHIR claim id immediately so polling can correlate.
-      if (result.fhirClaimId) {
-        await prisma.priorAuthorization.update({ where: { id: auth.id }, data: { fhirClaimId: result.fhirClaimId } }).catch(() => {})
+      // Persist claim id + any payer auth reference immediately so the poller
+      // and inbound webhooks can correlate this auth even while it's pending.
+      const correlate = {}
+      if (result.fhirClaimId) correlate.fhirClaimId = result.fhirClaimId
+      if (result.authNumber) correlate.authNumber = result.authNumber
+      if (Object.keys(correlate).length) {
+        await prisma.priorAuthorization.update({ where: { id: auth.id }, data: correlate }).catch(() => {})
       }
 
       if (result.pending) {

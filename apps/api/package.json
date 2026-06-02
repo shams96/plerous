@@ -11,7 +11,9 @@
     "db:generate": "prisma generate --schema=src/db/schema.prisma",
     "db:push": "prisma db push --schema=src/db/schema.prisma",
     "db:seed": "node src/db/seed.js",
-    "db:studio": "prisma studio --schema=src/db/schema.prisma"
+    "db:studio": "prisma studio --schema=src/db/schema.prisma",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
@@ -35,6 +37,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "prisma": "^5.14.0"
+    "prisma": "^5.14.0",
+    "vitest": "^2.1.9"
   }
 }
