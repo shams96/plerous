@@ -168,7 +168,7 @@ export class ReferralService {
         diagnosisCodes: referral.diagnosisCodes,
         procedureCodes: referral.procedureCodes,
         urgency: referral.urgency,
-        referringProviderNpi: referral.referringProvider.npi,
+        referringProviderNpi: referral.referringProvider?.npi,
       })
     }
 

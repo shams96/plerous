@@ -199,13 +199,14 @@ model Referral {
   id             String @id @default(uuid())
   referralNumber String @unique @default(cuid())
 
-  // Parties
-  sendingOrgId        String
-  sendingOrg          Organization  @relation("SendingOrg", fields: [sendingOrgId], references: [id])
+  // Parties — sending side is nullable: an INBOUND referral arrives from an
+  // off-network PCP (captured in source* fields below), with no on-network sender.
+  sendingOrgId        String?
+  sendingOrg          Organization? @relation("SendingOrg", fields: [sendingOrgId], references: [id])
   receivingOrgId      String?
   receivingOrg        Organization? @relation("ReceivingOrg", fields: [receivingOrgId], references: [id])
-  referringProviderId String
-  referringProvider   Provider      @relation("ReferringProvider", fields: [referringProviderId], references: [id])
+  referringProviderId String?
+  referringProvider   Provider?     @relation("ReferringProvider", fields: [referringProviderId], references: [id])
   receivingProviderId String?
   receivingProvider   Provider?     @relation("ReceivingProvider", fields: [receivingProviderId], references: [id])
   patientId           String
@@ -233,6 +234,12 @@ model Referral {
   targetSpecialty String?
   targetFax       String?
   targetState     String?
+
+  // External SENDER when this referral was ingested from outside (inbound fax /
+  // Direct / EHR). Feeds the growth loop (the outside PCP is a prospect).
+  sourceNpi       String?
+  sourceName      String?
+  sourceFax       String?
 
   // Delivery / receipt confirmation (specialist side)
   deliveredAt     DateTime?  // when transmitted to the specialist channel

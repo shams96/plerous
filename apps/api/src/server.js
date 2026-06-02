@@ -22,6 +22,7 @@ import onboardingRoutes from './modules/onboarding/onboarding.routes.js'
 import sessionRoutes from './modules/session/session.routes.js'
 import adminRoutes from './modules/admin/admin.routes.js'
 import agentRoutes from './modules/agents/brief.routes.js'
+import intakeRoutes from './modules/intake/intake.routes.js'
 import { startSentinel } from './workers/sentinel.worker.js'
 import { startSla } from './workers/sla.worker.js'
 import './events/subscribers.js' // registers Intelligence + Growth event subscribers
@@ -138,6 +139,7 @@ FHIR R4 native API with AI-powered prior authorization and EHR Intelligence Regi
   await app.register(sessionRoutes,     { prefix: '/v1/session' })
   await app.register(adminRoutes,       { prefix: '/v1/admin' })
   await app.register(agentRoutes,       { prefix: '/v1/agents' })
+  await app.register(intakeRoutes,      { prefix: '/v1/intake' })
 
   // FHIR R4 CapabilityStatement (Da Vinci PAS compliant)
   app.get('/fhir/r4/metadata', { schema: { hide: true } }, async (req) => {
