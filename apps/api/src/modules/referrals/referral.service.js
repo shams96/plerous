@@ -348,6 +348,49 @@ export class ReferralService {
     return prisma.referral.findUnique({ where: { id }, include: INCLUDES })
   }
 
+  /**
+   * Specialist confirms receipt via the public secure tracking link — no login.
+   * This is what makes "confirmed receipt" real for the non-payer channel:
+   * the office that received a faxed/secure-link referral clicks "Confirm
+   * receipt", which records acknowledgedAt and flips SUBMITTED → RECEIVED.
+   */
+  async acknowledgeByToken(token) {
+    const referral = await prisma.referral.findUnique({
+      where: { trackingToken: token },
+      include: { patient: true, receivingOrg: true, receivingProvider: true },
+    })
+    if (!referral) throw new AppError(404, 'Referral not found')
+
+    // Idempotent: if already acknowledged or further along, just report current state.
+    if (referral.status !== 'SUBMITTED') {
+      return { alreadyAcknowledged: true, status: referral.status, acknowledgedAt: referral.acknowledgedAt }
+    }
+
+    const now = new Date()
+    await prisma.referral.update({
+      where: { id: referral.id },
+      data: {
+        status: 'RECEIVED',
+        deliveredAt: referral.deliveredAt ?? now,
+        acknowledgedAt: now,
+        statusHistory: { push: { status: 'RECEIVED', timestamp: now.toISOString(), userId: 'specialist-link', note: 'Receipt confirmed via secure link' } },
+      },
+    })
+
+    if (referral.patient?.smsOptIn && referral.patient?.phone) {
+      const specialistName = referral.receivingProvider
+        ? `Dr. ${referral.receivingProvider.firstName} ${referral.receivingProvider.lastName}`
+        : referral.receivingOrg?.name ?? 'the specialist'
+      await notify.sms(
+        referral.patient.phone,
+        `✅ ${referral.patient.firstName}, your ${referral.specialty} referral has been RECEIVED by ${specialistName}. They will contact you to schedule. Track: ${process.env.DASHBOARD_URL ?? 'http://localhost:3000'}/track/${token}`,
+        referral.id, 'REFERRAL_CREATED',
+      ).catch(() => {})
+    }
+
+    return { acknowledged: true, status: 'RECEIVED', acknowledgedAt: now }
+  }
+
   async cancel(id, reason, user) {
     const referral = await this._get(id, user)
     if (['COMPLETED', 'CANCELLED'].includes(referral.status)) {

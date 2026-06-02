@@ -1,0 +1,12 @@
+{
+  "name": "@plerous/payer-sim",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Partner simulator — mimics a payer / clearinghouse (FHIR Da Vinci PAS + X12 278) for end-to-end testing without live partner access",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  }
+}

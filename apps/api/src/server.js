@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import helmet from '@fastify/helmet'
@@ -22,6 +23,7 @@ import sessionRoutes from './modules/session/session.routes.js'
 import adminRoutes from './modules/admin/admin.routes.js'
 import agentRoutes from './modules/agents/brief.routes.js'
 import { startSentinel } from './workers/sentinel.worker.js'
+import { startSla } from './workers/sla.worker.js'
 
 export async function buildApp() {
   const app = Fastify({
@@ -147,14 +149,15 @@ FHIR R4 native API with AI-powered prior authorization and EHR Intelligence Regi
 }
 
 // ── Start ─────────────────────────────────────────────────────────────────────
-const app = await buildApp()
+// Only auto-start when run directly (node src/server.js). When imported (e.g. by
+// the E2E test harness) this guard prevents a duplicate listen on import.
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href
 
-try {
+export async function start() {
+  const app = await buildApp()
   await app.listen({ port: config.port, host: '0.0.0.0' })
-
-  // Start background workers after server is up
   await startSentinel()
-
+  await startSla()
   console.log(`
 ╔══════════════════════════════════════════════════╗
 ║  ⚡ Plerous API — Phase 1                       ║
@@ -168,7 +171,14 @@ try {
 ║  🤖  AI Agents: ACTIVE                          ║
 ╚══════════════════════════════════════════════════╝
   `)
-} catch (err) {
-  app.log.error(err)
-  process.exit(1)
+  return app
+}
+
+if (isMain) {
+  try {
+    await start()
+  } catch (err) {
+    console.error(err)
+    process.exit(1)
+  }
 }
