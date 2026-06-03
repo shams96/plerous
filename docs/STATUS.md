@@ -26,16 +26,22 @@ One gateway per boundary (adapters per protocol, simulator-swappable). Reactive
 subsystems subscribe to events — never wired into the core. **North star: every
 referral makes the next one smarter** (event-sourced `ReferralEvent` → `ProviderStat`).
 
-## Where we are (branches / PRs)
-| Branch | Contents | State |
-|--------|----------|-------|
-| `main` | **Payer pipeline** (PR #1 merged): PayerGateway + FHIR PAS/Availity/X12 adapters, OAuth, webhooks (HMAC), eligibility, appeals, SLA worker, secure-link receipt; partner simulator; 14 E2E tests | ✅ merged, green |
-| `feature/off-network-delivery` | **PR #2 (open, green):** Modules 1–4 — event bus + Intelligence seed, DeliveryGateway+fax, Growth subscriber, IntakeGateway (inbound fax). 26 E2E tests total | 🟡 ready to merge |
+## Where we are — ALL ON `main` (PRs #1–#3 merged), 39/39 tests green
+`main` is the complete, current picture. For live branch/PR state always run
+`git log --oneline -10` + check open PRs — don't trust hard-coded PR numbers here.
 
-## Verified (✅🧪 = built + automated test)
+- **Payer pipeline** (PR #1): PayerGateway + FHIR PAS/Availity/X12 adapters, OAuth,
+  webhooks (HMAC), eligibility, appeals, SLA worker, secure-link receipt; partner simulator.
+- **Off-network Modules 1–4** (PR #2): event bus + Intelligence seed, DeliveryGateway+fax,
+  Growth subscriber, IntakeGateway (inbound fax).
+- **Security** (PR #3): TOTP MFA (enroll/2FA-login/backup codes), password strength,
+  account lockout.
+
+## Verified (✅🧪 = built + automated test) — 39 tests, 10 files
 Payer loop (approve/deny/poll/signed-webhook/eligibility/denial-feedback/expiry),
 webhook HMAC, secure-link receipt, DeliveryGateway channel selection, off-network→
-Prospect growth loop, inbound-fax intake, Intelligence ProviderStat rollups.
+Prospect growth loop, inbound-fax intake, Intelligence ProviderStat rollups,
+MFA full HTTP flow + backup codes, password-strength rules.
 **Full suite: 26/26 across 8 files; CI `e2e` job green.**
 
 ## Brand / frontend (done earlier sessions)
