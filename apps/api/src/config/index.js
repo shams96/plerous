@@ -26,7 +26,7 @@ export const config = {
     port: parseInt(process.env.SMTP_PORT || '587'),
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
-    from: process.env.EMAIL_FROM || 'noreply@refchain.ai',
+    from: process.env.EMAIL_FROM || 'noreply@plerous.com',
   },
 
   payers: {
@@ -56,7 +56,7 @@ export const config = {
   // SMART on FHIR
   dashboardUrl: process.env.DASHBOARD_URL || 'http://localhost:3000',
   smart: {
-    defaultClientId: process.env.SMART_CLIENT_ID || 'refchain_app',
+    defaultClientId: process.env.SMART_CLIENT_ID || 'plerous_app',
   },
 }
 

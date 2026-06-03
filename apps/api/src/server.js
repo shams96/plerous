@@ -20,6 +20,7 @@ import patientRoutes from './modules/patients/patient.routes.js'
 import ehrRoutes from './ehr/ehr.routes.js'
 import onboardingRoutes from './modules/onboarding/onboarding.routes.js'
 import sessionRoutes from './modules/session/session.routes.js'
+import mfaRoutes from './modules/session/mfa.routes.js'
 import adminRoutes from './modules/admin/admin.routes.js'
 import agentRoutes from './modules/agents/brief.routes.js'
 import intakeRoutes from './modules/intake/intake.routes.js'
@@ -42,7 +43,7 @@ export async function buildApp() {
 
   await app.register(cors, {
     origin: config.env === 'production'
-      ? ['https://app.refchain.ai', 'https://dashboard.refchain.ai']
+      ? ['https://app.plerous.com', 'https://www.plerous.com']
       : true,
     credentials: true,
   })
@@ -79,15 +80,15 @@ FHIR R4 native API with AI-powered prior authorization and EHR Intelligence Regi
 
 ### Base URL
 - Development: \`http://localhost:3001\`
-- Production: \`https://api.refchain.ai\`
+- Production: \`https://api.plerous.com\`
         `,
         version: '1.0.0',
-        contact: { email: 'api@refchain.ai' },
+        contact: { email: 'api@plerous.com' },
         license: { name: 'Proprietary' },
       },
       servers: [
         { url: config.apiBaseUrl, description: 'Current' },
-        { url: 'https://api.refchain.ai', description: 'Production' },
+        { url: 'https://api.plerous.com', description: 'Production' },
       ],
       components: {
         securitySchemes: {
@@ -137,6 +138,7 @@ FHIR R4 native API with AI-powered prior authorization and EHR Intelligence Regi
   await app.register(ehrRoutes,         { prefix: '/v1/ehr' })
   await app.register(onboardingRoutes,  { prefix: '/v1/onboarding' })
   await app.register(sessionRoutes,     { prefix: '/v1/session' })
+  await app.register(mfaRoutes,         { prefix: '/v1/session/mfa' })
   await app.register(adminRoutes,       { prefix: '/v1/admin' })
   await app.register(agentRoutes,       { prefix: '/v1/agents' })
   await app.register(intakeRoutes,      { prefix: '/v1/intake' })
