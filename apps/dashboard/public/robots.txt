@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /referrals
+Disallow: /patients
+Disallow: /providers
+Disallow: /authorizations
+Disallow: /analytics
+Disallow: /ehr
+Disallow: /paia
+
+Sitemap: https://plerous.com/sitemap.xml

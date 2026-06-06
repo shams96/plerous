@@ -12,7 +12,7 @@ Built for independent practices, physician groups, imaging centers, and surgical
 
 ```
 apps/
-  api/         Node + Express API — FHIR R4, Da Vinci PAS, 10 AI agents, Prisma/Postgres
+  api/         Node + Fastify API — FHIR R4, Da Vinci PAS, 10 AI agents, Prisma/Postgres
   dashboard/   Next.js 15 app (App Router) — landing, onboarding, referral + auth workflows
 docs/          Strategy, agent build plan, e2e scenarios
 packages/      Shared workspace packages
@@ -21,7 +21,7 @@ packages/      Shared workspace packages
 ## Tech stack
 
 - **Frontend** — Next.js 15 (App Router, React 19), Tailwind CSS v4, light/dark theming
-- **Backend** — Node.js + Express, Prisma ORM, PostgreSQL, Redis (queues/workers)
+- **Backend** — Node.js + Fastify, Prisma ORM, PostgreSQL, Redis (queues/workers)
 - **AI** — Anthropic Claude (PAIA pre-auth intelligence, recovery, revenue, scheduling agents)
 - **Standards** — FHIR R4, SMART on FHIR (OAuth + PKCE), Da Vinci PAS
 - **Infra** — Docker Compose (Postgres + Redis), Turbo monorepo

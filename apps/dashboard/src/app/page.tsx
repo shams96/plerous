@@ -763,6 +763,26 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ══ Contact / Enterprise ══════════════════════════════════════════════ */}
+      <section id="contact" className="py-20 px-6 rc-divider" style={s({ background: 'var(--rc-surface)' })}>
+        <div className="max-w-2xl mx-auto text-center reveal">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={s({ color: 'var(--rc-accent)' })}>Enterprise & payer partnerships</p>
+          <h2 className="text-3xl font-black rc-text mb-4">Let&rsquo;s talk.</h2>
+          <p className="text-sm rc-muted mb-8 leading-relaxed">
+            Building a white-label integration? Evaluating Plerous for your health system or payer network?
+            We work directly with EHR vendors, regional health systems, and payer partners.
+          </p>
+          <a
+            href="mailto:hello@plerous.com?subject=Enterprise%20Inquiry"
+            className="rc-btn-cta inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base"
+            style={s({ boxShadow: '0 0 24px color-mix(in srgb, var(--rc-accent) 30%, transparent)' })}
+          >
+            hello@plerous.com
+          </a>
+          <p className="text-xs rc-faint mt-4">We respond within one business day.</p>
+        </div>
+      </section>
+
       {/* ══ Footer ════════════════════════════════════════════════════════════ */}
       <footer className="rc-divider py-10 px-6" style={s({ background: 'var(--rc-surface)' })}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -773,12 +793,14 @@ export default async function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs rc-faint">
             <Link href="/login"      className="hover:rc-muted transition-colors" style={s({ color: 'var(--rc-text-faint)' })}>Sign in</Link>
             <Link href="/onboarding" className="hover:rc-muted transition-colors" style={s({ color: 'var(--rc-text-faint)' })}>Get started</Link>
+            <Link href="/privacy"    className="hover:rc-muted transition-colors" style={s({ color: 'var(--rc-text-faint)' })}>Privacy Policy</Link>
+            <Link href="/terms"      className="hover:rc-muted transition-colors" style={s({ color: 'var(--rc-text-faint)' })}>Terms</Link>
             <span>HIPAA compliant</span>
             <span>CMS-0057-F ready</span>
             <span>FHIR R4 · Da Vinci PAS</span>
           </div>
           <div className="flex items-center gap-2 text-xs rc-faint">
-            <span>hello@plerous.com</span>
+            <a href="mailto:hello@plerous.com" style={s({ color: 'var(--rc-text-faint)' })}>hello@plerous.com</a>
           </div>
         </div>
       </footer>

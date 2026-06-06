@@ -10,12 +10,14 @@ import { prisma } from '../db/client.js'
 import * as fhirPas from './adapters/fhir-pas.adapter.js'
 import * as availity from './adapters/availity.adapter.js'
 import * as x12 from './adapters/x12-edi.adapter.js'
+import * as optumGraphql from './adapters/optum-graphql.adapter.js'
 
 function pickAdapter(payer) {
   const apiType = (payer?.apiType || 'fhir_r4').toLowerCase()
   const name = (payer?.name || '').toLowerCase()
   if (apiType === 'edi_x12') return x12
   if (apiType === 'availity' || name.includes('availity')) return availity
+  if (apiType === 'optum_graphql') return optumGraphql
   return fhirPas // fhir_r4 + proprietary default to FHIR PAS
 }
 

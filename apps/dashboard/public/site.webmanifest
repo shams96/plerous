@@ -1,0 +1,12 @@
+{
+  "name": "Plerous",
+  "short_name": "Plerous",
+  "description": "Closed-Loop Referral Infrastructure for Independent Practices",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#5C2D8E",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
