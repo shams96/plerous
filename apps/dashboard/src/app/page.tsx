@@ -422,8 +422,8 @@ export default async function LandingPage() {
               <div className="flex flex-col gap-2">
                 {[
                   { icon: '✅', text: <>You submit the referral — already checked by <Term name="paia">PAIA</Term></> },
-                  { icon: '📤', text: <>Plerous sends it the way the specialist already works — fax, secure link, or <Term name="direct-message">Direct message</Term></> },
-                  { icon: '🛡️', text: <><Term name="sentinel">Sentinel</Term> watches it 24/7 and chases until the specialist confirms</> },
+                  { icon: '📤', text: <>Plerous sends it the way the specialist already works — secure link, in-app, or fax</> },
+                  { icon: '🛡️', text: <><Term name="sentinel">Sentinel</Term> watches it 24/7 — alerts on stalls and escalates until the loop closes</> },
                   { icon: '✅', text: <>Plerous gets the <Term name="prior-auth">prior authorization</Term> approved and the patient booked</> },
                   { icon: '💰', text: <>Loop closed. Revenue confirmed.</> },
                 ].map(({ icon, text }, i) => (

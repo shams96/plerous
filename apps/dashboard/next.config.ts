@@ -56,6 +56,10 @@ const nextConfig: NextConfig = {
     ]
   },
 
+  // Standalone output — bundles server + dependencies into .next/standalone/
+  // Upload that folder to Hostinger; no separate npm install needed.
+  output: 'standalone',
+
   // Production optimisations
   poweredByHeader: false, // Don't expose Next.js version
   compress: true,
