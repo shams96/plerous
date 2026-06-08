@@ -10,20 +10,25 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
-    "next": "^15.3.0",
+    "@fastify/jwt": "10.1.0",
+    "date-fns": "^4.1.0",
+    "fastify": "5.8.5",
+    "lucide-react": "^0.469.0",
+    "next": "^15.5.19",
+    "nodemailer": "8.0.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "lucide-react": "^0.469.0",
     "recharts": "^2.15.0",
-    "date-fns": "^4.1.0",
+    "uuid": "14.0.0",
+    "vitest": "4.1.8",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0",
     "tailwindcss": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.0"
+    "typescript": "^5.7.0"
   }
 }
