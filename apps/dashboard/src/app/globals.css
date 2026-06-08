@@ -253,18 +253,18 @@ html[data-theme="dark"] {
   to   { opacity: 1; transform: translateY(0);    }
 }
 
-.animate-pulse-glow      { animation: pulse-glow      6s ease-in-out infinite; }
-.animate-pulse-glow-slow { animation: pulse-glow-slow 9s ease-in-out infinite; }
-.animate-fade-up         { animation: fade-up  0.7s cubic-bezier(0.16,1,0.3,1) both; }
-.animate-fade-in         { animation: fade-in  0.6s ease both; }
+.animate-pulse-glow      { animation: none; }
+.animate-pulse-glow-slow { animation: none; }
+.animate-fade-up         { animation: fade-up  0.6s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-fade-in         { animation: fade-in  0.5s ease both; }
 .animate-marquee         { animation: marquee 30s linear infinite; }
-.animate-blink-dot       { animation: blink-dot 2s ease-in-out infinite; }
-.animate-float-a         { animation: float-a  7s ease-in-out infinite; }
-.animate-float-b         { animation: float-b  9s ease-in-out infinite; }
-.animate-float-c         { animation: float-c  6s ease-in-out infinite; }
-.animate-mesh-a          { animation: mesh-drift-a 14s ease-in-out infinite; }
-.animate-mesh-b          { animation: mesh-drift-b 18s ease-in-out infinite; }
-.animate-mesh-c          { animation: mesh-drift-c 22s ease-in-out infinite; }
+.animate-blink-dot       { /* no blink — static colored dot */ }
+.animate-float-a         { /* no float — static card */ }
+.animate-float-b         { /* no float — static card */ }
+.animate-float-c         { /* no float — static card */ }
+.animate-mesh-a          { /* no drift — static gradient blob */ }
+.animate-mesh-b          { /* no drift — static gradient blob */ }
+.animate-mesh-c          { /* no drift — static gradient blob */ }
 
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
@@ -348,24 +348,20 @@ html[data-theme="dark"] {
 }
 .grad-border:hover::before { opacity: 1; }
 
-/* Shimmer text — adapts to theme */
+/* Shimmer text — static gradient, no animation */
 .text-shimmer {
   background: linear-gradient(
-    105deg,
+    120deg,
     var(--rc-shimmer-from) 0%,
-    var(--rc-shimmer-mid)  35%,
-    var(--rc-shimmer-hi)   50%,
-    var(--rc-shimmer-mid)  65%,
-    var(--rc-shimmer-from) 100%
+    var(--rc-shimmer-mid)  60%,
+    var(--rc-shimmer-hi)   100%
   );
-  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: shimmer 5s linear infinite;
 }
 
-/* Activity feed cards in hero */
+/* Activity feed cards in hero — static, no scan animation */
 .activity-card {
   background: var(--rc-surface);
   border: 1px solid var(--rc-border);
@@ -376,16 +372,6 @@ html[data-theme="dark"] {
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(16px);
-}
-.activity-card::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--rc-accent), var(--rc-accent-2));
-  top: 0;
-  animation: scan 3s ease-in-out infinite;
-  animation-play-state: paused;
 }
 
 /* Agent showcase card */
@@ -653,23 +639,12 @@ html[data-theme="dark"]   .grain-overlay::after { opacity: 0.022; mix-blend-mode
 /* Fallback: just visible for browsers without scroll-timeline support */
 .scroll-reveal-header { opacity: 1; transform: none; }
 
-/* ── C. 3D card tilt (spatial UI) ────────────────────────────────────────── */
-/* JS in LandingClient.tsx sets --tilt-x and --tilt-y on mousemove.          */
+/* ── C. Card — no 3D tilt, clean flat design ─────────────────────────────── */
 .tilt-card {
-  transform-style: preserve-3d;
-  transform:
-    perspective(900px)
-    rotateX(var(--tilt-x, 0deg))
-    rotateY(var(--tilt-y, 0deg));
-  transition: transform 0.18s ease-out;
-  will-change: transform;
+  /* 3D tilt removed — modern flat design */
 }
-/* Lift inner content slightly for parallax depth feel */
-.tilt-card > * {
-  transform: translateZ(8px);
-  transition: transform 0.18s ease-out;
-}
-.tilt-card:hover > * { transform: translateZ(14px); }
+.tilt-card > * { /* no parallax lift */ }
+.tilt-card:hover > * { /* no parallax lift */ }
 
 /* ── D. Glassmorphism 2.0 ────────────────────────────────────────────────── */
 /* Light-only upgrade: frosted glass with specular highlight + gradient edge  */
@@ -732,31 +707,15 @@ html[data-theme="light"] .glass-card::before {
   0%   { --btn-angle: 135deg; }
   100% { --btn-angle: 495deg; }
 }
-/* Sheen sweep on top */
-.rc-btn-cta::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 60%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.20), transparent);
-  animation: btn-sheen 3.5s ease-in-out infinite;
-}
-@keyframes btn-sheen {
-  0%   { left: -100%; opacity: 0; }
-  30%  { opacity: 1; }
-  60%  { left: 140%; opacity: 0; }
-  100% { left: 140%; opacity: 0; }
-}
+/* No sheen sweep — clean button */
 
-/* ── F. Spring hover on cards ────────────────────────────────────────────── */
+/* ── F. Hover — clean lift, no spring bounce ─────────────────────────────── */
 .spring-hover {
-  transition:
-    transform   0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow  0.30s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .spring-hover:hover {
-  transform:   translateY(-5px) scale(1.018);
-  box-shadow:  var(--rc-shadow-lg);
+  transform:  translateY(-2px);
+  box-shadow: var(--rc-shadow-md);
 }
 
 /* ── G. Hero clip-path section divider (light only) ─────────────────────── */
@@ -800,10 +759,7 @@ html[data-theme="dark"] .hero-glow::before {
   );
 }
 
-/* ── J. Activity card scan line — animated in light mode ────────────────── */
-html[data-theme="light"] .activity-card::after {
-  animation-play-state: running;
-}
+/* ── J. Activity card scan line — removed ────────────────────────────────── */
 
 /* ── K. Pricing card highlight — elevated in light ─────────────────────── */
 html[data-theme="light"] .pricing-featured {

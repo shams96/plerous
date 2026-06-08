@@ -48,36 +48,9 @@ export default function LandingClient() {
     )
     document.querySelectorAll('.counter').forEach(el => counterObserver.observe(el))
 
-    // ── 3D card tilt (spatial UI) ─────────────────────────────────────────
-    // Sets CSS custom properties --tilt-x and --tilt-y on each .tilt-card
-    // based on cursor position relative to the card. Max ±6 degrees.
-    const MAX_DEG = 6
-    function onTileMove(e: MouseEvent) {
-      const card = (e.currentTarget as HTMLElement)
-      const { left, top, width, height } = card.getBoundingClientRect()
-      const x = (e.clientX - left) / width  - 0.5   // -0.5 … 0.5
-      const y = (e.clientY - top)  / height - 0.5
-      card.style.setProperty('--tilt-y',  `${( x * MAX_DEG).toFixed(2)}deg`)
-      card.style.setProperty('--tilt-x',  `${(-y * MAX_DEG).toFixed(2)}deg`)
-    }
-    function onTileLeave(e: MouseEvent) {
-      const card = e.currentTarget as HTMLElement
-      card.style.setProperty('--tilt-x', '0deg')
-      card.style.setProperty('--tilt-y', '0deg')
-    }
-    const tiltCards = document.querySelectorAll<HTMLElement>('.tilt-card')
-    tiltCards.forEach(card => {
-      card.addEventListener('mousemove', onTileMove)
-      card.addEventListener('mouseleave', onTileLeave)
-    })
-
     return () => {
       revealObserver.disconnect()
       counterObserver.disconnect()
-      tiltCards.forEach(card => {
-        card.removeEventListener('mousemove', onTileMove)
-        card.removeEventListener('mouseleave', onTileLeave)
-      })
     }
   }, [])
 

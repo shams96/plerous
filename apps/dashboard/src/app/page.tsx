@@ -127,8 +127,8 @@ export default async function LandingPage() {
           style={s({ width: 500, height: 500, bottom: '5%', left: '5%', background: 'radial-gradient(ellipse, var(--rc-mesh-c) 0%, transparent 70%)', filter: 'blur(40px)' })}
         />
 
-        {/* Dot grid */}
-        <div className="dot-grid pointer-events-none absolute inset-0" />
+        {/* Fine dot grid — very subtle */}
+        <div className="dot-grid pointer-events-none absolute inset-0 opacity-60" />
 
         {/* Hero content */}
         <div className="relative z-10 max-w-5xl mx-auto text-center">
@@ -138,14 +138,14 @@ export default async function LandingPage() {
               className="flex items-center gap-1.5 text-xs font-bold rounded-full px-3 py-1.5"
               style={s({ color: 'var(--rc-accent)', background: 'var(--rc-accent-soft)', border: '1px solid var(--rc-border-2)' })}
             >
-              <span className="animate-blink-dot w-1.5 h-1.5 rounded-full shrink-0" style={s({ background: 'var(--rc-accent)' })} />
+              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={s({ background: 'var(--rc-accent)' })} />
               1 in 3 referrals never reach the specialist
             </span>
             <span
               className="hidden sm:flex items-center gap-1.5 text-xs font-bold rounded-full px-3 py-1.5"
               style={s({ color: 'var(--rc-warning)', background: 'var(--rc-warning-soft)', border: '1px solid color-mix(in srgb, var(--rc-warning) 25%, transparent)' })}
             >
-              <span className="animate-blink-dot w-1.5 h-1.5 rounded-full shrink-0" style={s({ background: 'var(--rc-warning)' })} />
+              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={s({ background: 'var(--rc-warning)' })} />
               CMS-0057-F: {daysUntilMandate} days until mandate
             </span>
           </div>
@@ -203,13 +203,13 @@ export default async function LandingPage() {
             centered hero leaves a clear right gutter; hidden below to avoid
             overlapping the headline/subheadline. */}
         <div className="hidden 2xl:block pointer-events-none absolute inset-0 z-10">
-          <div className="animate-float-a absolute" style={s({ top: '20%', right: '1.5%' })}>
+          <div className="absolute" style={s({ top: '22%', right: '2%', opacity: 0.92 })}>
             <ActivityCard accent="var(--rc-success)" icon="✓" label="PAIA decision" text="auto_submit · 94% confidence" sub="Pulmonology · BCBS TX" />
           </div>
-          <div className="animate-float-b absolute" style={s({ top: '50%', right: '2.5%' })}>
+          <div className="absolute" style={s({ top: '48%', right: '3%', opacity: 0.88 })}>
             <ActivityCard accent="var(--rc-accent)" icon="🛡️" label="Sentinel recovered" text="Referral #RC-2847 re-sent" sub="72h SLA · specialist notified" />
           </div>
-          <div className="animate-float-c absolute" style={s({ bottom: '16%', right: '1%' })}>
+          <div className="absolute" style={s({ bottom: '18%', right: '1.5%', opacity: 0.84 })}>
             <ActivityCard accent="var(--rc-warning)" icon="$" label="Auth approved" text="BCBS TX · $2,400" sub="Sleep study · auth #TX-994821" />
           </div>
         </div>
@@ -531,7 +531,7 @@ export default async function LandingPage() {
                 <p className="text-sm font-bold mb-1.5" style={s({ color: 'var(--rc-text)' })}>{agent.name}</p>
                 <p className="text-xs rc-muted leading-relaxed">{agent.desc}</p>
                 <div className="flex items-center gap-1.5 mt-4">
-                  <span className="animate-blink-dot w-1.5 h-1.5 rounded-full" style={s({ background: agent.color })} />
+                  <span className="w-1.5 h-1.5 rounded-full" style={s({ background: agent.color })} />
                   <span className="text-[10px] font-bold uppercase tracking-wider" style={s({ color: agent.color })}>Active</span>
                 </div>
               </div>
@@ -591,7 +591,7 @@ export default async function LandingPage() {
                 <p className="text-sm rc-muted leading-relaxed">Runs every 15 minutes. Alerts on stale drafts, unresolved PAIA flags, expiring auths, and stuck prior auth submissions. Auto-recovers.</p>
               </div>
               <div className="mt-4 text-xs font-semibold flex items-center gap-1.5" style={s({ color: 'var(--rc-success)' })}>
-                <span className="animate-blink-dot w-1.5 h-1.5 rounded-full" style={s({ background: 'var(--rc-success)' })} />
+                <span className="w-1.5 h-1.5 rounded-full" style={s({ background: 'var(--rc-success)' })} />
                 Always on · SMS + email alerts
               </div>
             </div>
@@ -727,9 +727,8 @@ export default async function LandingPage() {
       {/* ══ Mandate CTA ═══════════════════════════════════════════════════════ */}
       <section className="relative py-32 px-6 overflow-hidden rc-divider" style={s({ background: 'var(--rc-surface-2)' })}>
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="w-[700px] h-[400px] rounded-full animate-mesh-a" style={s({ background: 'radial-gradient(ellipse, var(--rc-mesh-a) 0%, transparent 70%)', filter: 'blur(60px)' })} />
+          <div className="w-[700px] h-[400px] rounded-full" style={s({ background: 'radial-gradient(ellipse, var(--rc-mesh-a) 0%, transparent 70%)', filter: 'blur(60px)' })} />
         </div>
-        <div className="dot-grid pointer-events-none absolute inset-0 opacity-50" />
         <div className="relative z-10 max-w-3xl mx-auto text-center reveal">
           <p className="text-xs font-bold uppercase tracking-widest mb-4" style={s({ color: 'var(--rc-warning)' })}>The clock is running</p>
           <h2 className="text-4xl md:text-5xl font-black leading-tight mb-6 rc-text">
