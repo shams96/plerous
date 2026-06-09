@@ -57,21 +57,27 @@ export default async function LandingPage() {
   )
 
   return (
-    <div className="landing grain-overlay min-h-screen overflow-x-hidden">
+    <div className="landing min-h-screen overflow-x-hidden">
       <LandingClient />
+
+      {/* ══ Announcement Bar ═════════════════════════════════════════════════ */}
+      <div className="announce-bar">
+        <span className="opacity-70">UHC Medicare Advantage now requires referrals for all PCPs · </span>
+        <a href="/onboarding">CMS-0057-F mandate: {daysUntilMandate} days — Get compliant free →</a>
+      </div>
 
       {/* ══ Fixed Nav ═════════════════════════════════════════════════════════ */}
       <div
-        className="landing-nav rc-glass fixed top-0 inset-x-0 z-50 border-b"
-        style={s({ backdropFilter: 'blur(24px)' })}
+        className="landing-nav fixed inset-x-0 z-50 border-b"
+        style={s({ top: '37px', backdropFilter: 'blur(24px)' })}
       >
-        <nav className="flex items-center justify-between px-6 md:px-8 py-4 max-w-7xl mx-auto">
+        <nav className="flex items-center justify-between px-6 md:px-8 py-3.5 max-w-7xl mx-auto">
           <div className="flex items-center gap-2">
             <PlerousLogo size={22} />
-            <span className="text-base font-bold tracking-tight rc-text">Plerous</span>
+            <span className="text-base font-bold tracking-tight" style={s({ color: '#F0EEFF' })}>Plerous</span>
             <span
               className="text-[10px] font-bold rounded px-1.5 py-0.5 hidden sm:block"
-              style={s({ color: 'var(--rc-accent)', background: 'var(--rc-accent-soft)', border: '1px solid var(--rc-border-2)' })}
+              style={s({ color: '#9B6DE8', background: 'rgba(155,109,232,0.12)', border: '1px solid rgba(155,109,232,0.25)' })}
             >
               FHIR R4
             </span>
@@ -83,7 +89,6 @@ export default async function LandingPage() {
                 key={href}
                 href={href}
                 className="rc-nav-link text-sm font-medium transition-colors"
-                style={s({ color: 'var(--rc-text-muted)' })}
               >
                 {['Calculator', 'How it works', 'Agents', 'Pricing'][i]}
               </a>
@@ -95,14 +100,14 @@ export default async function LandingPage() {
             <Link
               href="/login"
               className="text-sm font-medium px-3 py-1.5 transition-colors"
-              style={s({ color: 'var(--rc-text-muted)' })}
+              style={s({ color: 'rgba(200,190,240,0.70)' })}
             >
               Sign in
             </Link>
             <Link
               href="/onboarding"
               className="rc-btn-cta inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-xl"
-              style={s({ boxShadow: '0 0 24px color-mix(in srgb, var(--rc-accent) 35%, transparent)' })}
+              style={s({ boxShadow: '0 0 24px rgba(108,61,181,0.40)' })}
             >
               Start free <ArrowRight size={13} />
             </Link>
@@ -110,114 +115,157 @@ export default async function LandingPage() {
         </nav>
       </div>
 
-      {/* ══ Hero ══════════════════════════════════════════════════════════════ */}
-      <section className="hero-clip relative min-h-screen flex flex-col items-center justify-center pt-20 px-6 overflow-hidden">
+      {/* ══ Hero — dark section ("a shade of dark, not black") ══════════════ */}
+      <section className="hero-dark relative flex flex-col items-center justify-center px-6 overflow-hidden"
+        style={s({ paddingTop: '160px', paddingBottom: '80px', minHeight: '92vh' })}>
 
-        {/* Animated mesh gradient blobs */}
-        <div
-          className="animate-mesh-a pointer-events-none absolute rounded-full"
-          style={s({ width: 900, height: 700, top: '-12%', left: '25%', transform: 'translateX(-50%)', background: 'radial-gradient(ellipse, var(--rc-mesh-a) 0%, transparent 70%)', filter: 'blur(40px)' })}
-        />
-        <div
-          className="animate-mesh-b pointer-events-none absolute rounded-full"
-          style={s({ width: 600, height: 600, top: '10%', right: '-8%', background: 'radial-gradient(ellipse, var(--rc-mesh-b) 0%, transparent 70%)', filter: 'blur(40px)' })}
-        />
-        <div
-          className="animate-mesh-c pointer-events-none absolute rounded-full"
-          style={s({ width: 500, height: 500, bottom: '5%', left: '5%', background: 'radial-gradient(ellipse, var(--rc-mesh-c) 0%, transparent 70%)', filter: 'blur(40px)' })}
-        />
+        {/* Subtle dot grid */}
+        <div className="hero-dark-dot pointer-events-none absolute inset-0" />
 
-        {/* Fine dot grid — very subtle */}
-        <div className="dot-grid pointer-events-none absolute inset-0 opacity-60" />
+        {/* Hero content — left-aligned on lg+, centered on mobile (Orkes pattern) */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center">
 
-        {/* Hero content */}
-        <div className="relative z-10 max-w-5xl mx-auto text-center">
-          {/* Eyebrow — human-scale stat, not a compliance badge */}
-          <div className="animate-fade-up flex items-center justify-center gap-2.5 mb-10 flex-wrap">
-            <span
-              className="flex items-center gap-1.5 text-xs font-bold rounded-full px-3 py-1.5"
-              style={s({ color: 'var(--rc-accent)', background: 'var(--rc-accent-soft)', border: '1px solid var(--rc-border-2)' })}
-            >
-              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={s({ background: 'var(--rc-accent)' })} />
-              1 in 3 referrals never reach the specialist
-            </span>
-            <span
-              className="hidden sm:flex items-center gap-1.5 text-xs font-bold rounded-full px-3 py-1.5"
-              style={s({ color: 'var(--rc-warning)', background: 'var(--rc-warning-soft)', border: '1px solid color-mix(in srgb, var(--rc-warning) 25%, transparent)' })}
-            >
-              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={s({ background: 'var(--rc-warning)' })} />
-              CMS-0057-F: {daysUntilMandate} days until mandate
-            </span>
-          </div>
+            {/* Left: copy */}
+            <div className="text-center lg:text-left">
+              {/* Eyebrow */}
+              <div className="animate-fade-up flex items-center justify-center lg:justify-start gap-2.5 mb-8 flex-wrap">
+                <span
+                  className="flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-1.5"
+                  style={s({ color: '#9B6DE8', background: 'rgba(155,109,232,0.12)', border: '1px solid rgba(155,109,232,0.25)' })}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={s({ background: '#9B6DE8' })} />
+                  1 in 3 referrals never reach the specialist
+                </span>
+              </div>
 
-          {/* Headline — the brand command, villain-first */}
-          <h1 className="animate-fade-up delay-100 font-black leading-none tracking-tight mb-6 hero-glow">
-            <span className="text-shimmer block" style={s({ fontSize: 'clamp(72px,11vw,128px)', fontWeight: 900, letterSpacing: '-0.03em' })}>
-              Close the loop.
-            </span>
-            <span className="block mt-4 rc-text" style={s({ fontSize: 'clamp(18px,2.6vw,32px)', fontWeight: 700, lineHeight: 1.3, maxWidth: '820px', margin: '16px auto 0' })}>
-              Independent practices, physician groups, imaging centers, and surgical facilities
-              lose millions every year to referrals that disappear, authorizations that stall,
-              and hand-offs no one follows up on.
-            </span>
-            <span className="block mt-4 rc-muted" style={s({ fontSize: 'clamp(15px,1.8vw,22px)', fontWeight: 500, lineHeight: 1.3 })}>
-              Plerous is the closed-loop referral infrastructure that ends it.
-            </span>
-          </h1>
+              {/* Headline */}
+              <h1 className="animate-fade-up delay-100 font-black leading-none tracking-tight mb-6">
+                <span
+                  className="text-shimmer block"
+                  style={s({ fontSize: 'clamp(52px,7vw,88px)', fontWeight: 900, letterSpacing: '-0.03em', color: '#F0EEFF' })}
+                >
+                  Close the loop.
+                </span>
+                <span
+                  className="block mt-5"
+                  style={s({ fontSize: 'clamp(16px,1.9vw,22px)', fontWeight: 500, lineHeight: 1.6, color: 'rgba(200,190,240,0.75)', maxWidth: '520px' })}
+                >
+                  Independent practices, physician groups, and surgical facilities lose millions every year to referrals
+                  that disappear and authorizations that stall.
+                </span>
+                <span
+                  className="block mt-3"
+                  style={s({ fontSize: 'clamp(15px,1.6vw,19px)', fontWeight: 600, color: 'rgba(220,210,255,0.90)' })}
+                >
+                  Plerous is the closed-loop infrastructure that ends it.
+                </span>
+              </h1>
 
-          {/* CTAs */}
-          <div className="animate-fade-up delay-200 flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 mb-8">
-            <Link
-              href="/onboarding"
-              className="rc-btn-cta inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base"
-              style={s({ boxShadow: '0 0 40px color-mix(in srgb, var(--rc-accent) 35%, transparent)' })}
-            >
-              Close the loop for your practice <ArrowRight size={17} />
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 font-semibold px-8 py-4 rounded-xl transition-all text-base rc-text"
-              style={s({ border: '1px solid var(--rc-border-2)', background: 'var(--rc-accent-soft)' })}
-            >
-              Sign in
-            </Link>
-          </div>
+              {/* CTAs */}
+              <div className="animate-fade-up delay-200 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mt-10 mb-8">
+                <Link
+                  href="/onboarding"
+                  className="rc-btn-cta inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-base font-semibold"
+                  style={s({ boxShadow: '0 0 40px rgba(108,61,181,0.45)' })}
+                >
+                  Close the loop for your practice <ArrowRight size={16} />
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 font-semibold px-7 py-3.5 rounded-xl transition-all text-base"
+                  style={s({ border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(200,190,240,0.80)', background: 'rgba(255,255,255,0.04)' })}
+                >
+                  Sign in
+                </Link>
+              </div>
 
-          {/* Trust strip — compliance belongs here, supporting the decision, not leading the story */}
-          <div className="animate-fade-up delay-300 flex flex-wrap items-center justify-center gap-5 text-xs font-medium rc-faint">
-            {[
-              { key: 'hipaa',   node: <>HIPAA compliant</> },
-              { key: 'fhir',    node: <><Term name="fhir-r4">FHIR R4</Term> native</> },
-              { key: 'cms',     node: <><Term name="cms-0057">CMS-0057-F</Term> ready (Jan 2027)</> },
-              { key: 'davinci', node: <><Term name="davinci-pas">Da Vinci PAS</Term></> },
-              { key: 'free',    node: <>Free to start</> },
-            ].map(({ key, node }) => (
-              <span key={key} className="flex items-center gap-1.5">
-                <CheckCircle2 size={11} style={s({ color: 'var(--rc-accent)' })} /> {node}
-              </span>
-            ))}
-          </div>
-        </div>
+              {/* Trust strip */}
+              <div className="animate-fade-up delay-300 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs font-medium"
+                style={s({ color: 'rgba(180,170,220,0.55)' })}>
+                {[
+                  { key: 'hipaa',   node: <>HIPAA compliant</> },
+                  { key: 'fhir',    node: <><Term name="fhir-r4">FHIR R4</Term> native</> },
+                  { key: 'cms',     node: <><Term name="cms-0057">CMS-0057-F</Term> ready</> },
+                  { key: 'free',    node: <>Free to start</> },
+                ].map(({ key, node }) => (
+                  <span key={key} className="flex items-center gap-1.5">
+                    <CheckCircle2 size={11} style={s({ color: '#9B6DE8' })} /> {node}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-        {/* Floating activity cards — only on very wide screens (2xl+) where the
-            centered hero leaves a clear right gutter; hidden below to avoid
-            overlapping the headline/subheadline. */}
-        <div className="hidden 2xl:block pointer-events-none absolute inset-0 z-10">
-          <div className="absolute" style={s({ top: '22%', right: '2%', opacity: 0.92 })}>
-            <ActivityCard accent="var(--rc-success)" icon="✓" label="PAIA decision" text="auto_submit · 94% confidence" sub="Pulmonology · BCBS TX" />
-          </div>
-          <div className="absolute" style={s({ top: '48%', right: '3%', opacity: 0.88 })}>
-            <ActivityCard accent="var(--rc-accent)" icon="🛡️" label="Sentinel recovered" text="Referral #RC-2847 re-sent" sub="72h SLA · specialist notified" />
-          </div>
-          <div className="absolute" style={s({ bottom: '18%', right: '1.5%', opacity: 0.84 })}>
-            <ActivityCard accent="var(--rc-warning)" icon="$" label="Auth approved" text="BCBS TX · $2,400" sub="Sleep study · auth #TX-994821" />
+            {/* Right: product panel — the "shade of dark" moment */}
+            <div className="hidden lg:block animate-fade-up delay-300">
+              <div className="hero-panel overflow-hidden">
+                {/* Panel header — traffic light dots */}
+                <div className="hero-panel-header">
+                  <div className="hero-panel-dot" style={s({ background: '#FF5F57' })} />
+                  <div className="hero-panel-dot" style={s({ background: '#FFBD2E' })} />
+                  <div className="hero-panel-dot" style={s({ background: '#28C840' })} />
+                  <span className="ml-3 text-xs font-mono" style={s({ color: 'rgba(200,190,240,0.40)' })}>Plerous · Referral Dashboard</span>
+                </div>
+
+                {/* Referral workflow mock */}
+                <div className="p-5 space-y-3">
+                  {/* Active referral row */}
+                  {[
+                    { id: 'RC-2847', patient: 'Margaret T.', specialist: 'Dr. Patel · Pulmonology', status: 'Auth approved', statusColor: '#28C840', payer: 'BCBS TX · $2,400', time: '2m ago' },
+                    { id: 'RC-2841', patient: 'James W.', specialist: 'Dr. Kim · Cardiology', status: 'PAIA check', statusColor: '#9B6DE8', payer: 'UHC MA · $3,100', time: '14m ago' },
+                    { id: 'RC-2836', patient: 'Linda R.', specialist: 'Dr. Chen · Sleep Med', status: 'Sentinel alert', statusColor: '#FFBD2E', payer: 'Aetna · $1,800', time: '1h ago' },
+                    { id: 'RC-2829', patient: 'Robert K.', specialist: 'Dr. Davis · Nephrology', status: 'Loop closed', statusColor: '#28C840', payer: 'Cigna · $2,900', time: '3h ago' },
+                  ].map((r) => (
+                    <div key={r.id}
+                      className="flex items-center justify-between rounded-lg px-4 py-3"
+                      style={s({ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' })}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-xs font-mono shrink-0" style={s({ color: 'rgba(180,170,220,0.40)' })}>{r.id}</span>
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold truncate" style={s({ color: '#E8E2FF' })}>{r.patient}</div>
+                          <div className="text-xs truncate" style={s({ color: 'rgba(180,170,220,0.50)' })}>{r.specialist}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 shrink-0 ml-4">
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                          style={s({ color: r.statusColor, background: `${r.statusColor}18`, border: `1px solid ${r.statusColor}30` })}>
+                          {r.status}
+                        </span>
+                        <div className="text-right hidden xl:block">
+                          <div className="text-xs font-semibold" style={s({ color: 'rgba(200,190,240,0.70)' })}>{r.payer}</div>
+                          <div className="text-xs" style={s({ color: 'rgba(180,170,220,0.35)' })}>{r.time}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Bottom stat bar */}
+                  <div className="flex items-center justify-between pt-2 px-1">
+                    {[
+                      { label: 'Active', value: '47', color: '#9B6DE8' },
+                      { label: 'Auth rate', value: '91%', color: '#28C840' },
+                      { label: 'Avg close', value: '18h', color: '#9B6DE8' },
+                      { label: 'Recovered', value: '$94K', color: '#28C840' },
+                    ].map((stat) => (
+                      <div key={stat.label} className="text-center">
+                        <div className="text-base font-bold" style={s({ color: stat.color })}>{stat.value}</div>
+                        <div className="text-xs" style={s({ color: 'rgba(180,170,220,0.40)' })}>{stat.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <div className="animate-fade-in delay-700 absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 rc-faint">
+        <div className="animate-fade-in delay-700 absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          style={s({ color: 'rgba(180,170,220,0.35)' })}>
           <span className="text-xs">scroll</span>
-          <div className="w-px h-8" style={s({ background: 'linear-gradient(to bottom, var(--rc-text-faint), transparent)' })} />
+          <div className="w-px h-8" style={s({ background: 'linear-gradient(to bottom, rgba(180,170,220,0.35), transparent)' })} />
         </div>
       </section>
 

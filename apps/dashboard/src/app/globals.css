@@ -21,28 +21,40 @@
 html[data-theme="light"] {
   color-scheme: light;
 
-  /* Backgrounds — warm cream, zero blue tint */
-  --rc-bg:           #FAFAF8;
-  --rc-bg-alt:       #F3EFE9;
+  /* Backgrounds — cool purple-tinted white (Orkes-inspired, not warm cream) */
+  --rc-bg:           #FAF9FF;
+  --rc-bg-alt:       #F2F0FA;
   --rc-surface:      #FFFFFF;
-  --rc-surface-2:    #F8F5F0;
-  --rc-surface-3:    #EDE8DF;
+  --rc-surface-2:    #F5F3FC;
+  --rc-surface-3:    #EAE7F5;
+
+  /* Hero dark — "a shade of dark", not black */
+  --rc-hero-bg:      #0D0E1F;
+  --rc-hero-bg-2:    #13152E;
+  --rc-hero-surface: #1A1D3A;
+  --rc-hero-border:  rgba(255, 255, 255, 0.08);
+  --rc-hero-text:    #F0EEFF;
+  --rc-hero-muted:   rgba(200, 190, 240, 0.70);
+
+  /* Announcement bar */
+  --rc-announce-bg:  #0F0F0F;
+  --rc-announce-accent: #9B6DE8;
 
   /* Borders — amethyst-tinted */
   --rc-border:       rgba(92, 45, 142, 0.10);
   --rc-border-2:     rgba(92, 45, 142, 0.22);
 
-  /* Text — warm near-black charcoal, no blue */
-  --rc-text:         #1A1612;
-  --rc-text-2:       #2E2820;
-  --rc-text-muted:   #6B5E4C;
-  --rc-text-faint:   #A0907A;
+  /* Text — cool near-black */
+  --rc-text:         #120F1E;
+  --rc-text-2:       #2A2540;
+  --rc-text-muted:   #5A5370;
+  --rc-text-faint:   #9B94B8;
 
   /* Accent — Deep Amethyst primary + Warm Amber secondary */
-  --rc-accent:       #5C2D8E;
-  --rc-accent-hi:    #7B42B8;
+  --rc-accent:       #6C3DB5;
+  --rc-accent-hi:    #8B5CF6;
   --rc-accent-2:     #E8941A;
-  --rc-accent-soft:  rgba(92, 45, 142, 0.08);
+  --rc-accent-soft:  rgba(108, 61, 181, 0.08);
 
   /* Semantic */
   --rc-success:      #1A6B45;
@@ -51,33 +63,34 @@ html[data-theme="light"] {
   --rc-warning-soft: rgba(154, 90, 8, 0.08);
   --rc-danger:       #A51C1C;
   --rc-danger-soft:  rgba(165, 28, 28, 0.08);
-  --rc-purple:       #6D28D9;
-  --rc-purple-soft:  rgba(109, 40, 217, 0.08);
+  --rc-purple:       #7C3AED;
+  --rc-purple-soft:  rgba(124, 58, 237, 0.08);
   --rc-cyan:         #0E7490;
   --rc-cyan-soft:    rgba(14, 116, 144, 0.08);
 
-  /* Shadows — warm sepia tinted (premium, not cold blue) */
-  --rc-shadow-sm:    0 1px 3px rgba(50, 10, 80, 0.07),  0 2px 8px rgba(50, 10, 80, 0.04);
-  --rc-shadow-md:    0 4px 16px rgba(50, 10, 80, 0.09), 0 8px 28px rgba(50, 10, 80, 0.05);
-  --rc-shadow-lg:    0 8px 40px rgba(50, 10, 80, 0.13), 0 20px 60px rgba(50, 10, 80, 0.07);
-  --rc-glow:         0 0 60px rgba(92, 45, 142, 0.18);
+  /* Shadows */
+  --rc-shadow-sm:    0 1px 3px rgba(30, 10, 70, 0.07),  0 2px 8px rgba(30, 10, 70, 0.04);
+  --rc-shadow-md:    0 4px 16px rgba(30, 10, 70, 0.09), 0 8px 28px rgba(30, 10, 70, 0.05);
+  --rc-shadow-lg:    0 8px 40px rgba(30, 10, 70, 0.13), 0 20px 60px rgba(30, 10, 70, 0.07);
+  --rc-glow:         0 0 60px rgba(108, 61, 181, 0.22);
 
-  /* Mesh gradient blobs — amethyst + amber */
-  --rc-mesh-a:       rgba(92,  45, 142, 0.10);
-  --rc-mesh-b:       rgba(232, 148,  26, 0.07);
-  --rc-mesh-c:       rgba(123,  66, 184, 0.07);
+  /* Mesh gradient blobs */
+  --rc-mesh-a:       rgba(108, 61, 181, 0.12);
+  --rc-mesh-b:       rgba(139, 92, 246, 0.08);
+  --rc-mesh-c:       rgba(124, 58, 237, 0.07);
 
-  /* Nav — clean warm white frosted glass */
-  --rc-nav-bg:       rgba(250, 250, 248, 0.94);
-  --rc-nav-border:   rgba(92, 45, 142, 0.12);
+  /* Nav — dark always (Orkes pattern) */
+  --rc-nav-bg:       rgba(13, 14, 31, 0.96);
+  --rc-nav-border:   rgba(255, 255, 255, 0.07);
+  --rc-nav-text:     rgba(200, 190, 240, 0.80);
 
   /* Dot grid */
-  --rc-dot:          rgba(92, 45, 142, 0.07);
+  --rc-dot:          rgba(108, 61, 181, 0.07);
 
   /* Shimmer headline — amethyst sweep */
-  --rc-shimmer-from: #3B1070;
-  --rc-shimmer-mid:  #7B42B8;
-  --rc-shimmer-hi:   #A06AE0;
+  --rc-shimmer-from: #C49EF0;
+  --rc-shimmer-mid:  #ffffff;
+  --rc-shimmer-hi:   #DBC4F8;
 }
 
 html[data-theme="dark"] {
@@ -302,11 +315,60 @@ html[data-theme="dark"] {
   transition: background 0.35s ease, color 0.35s ease;
 }
 
-/* Fixed nav */
+/* Announcement bar — always dark */
+.announce-bar {
+  background: var(--rc-announce-bg);
+  color: rgba(200, 190, 240, 0.85);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 10px 24px;
+  letter-spacing: 0.01em;
+}
+.announce-bar a { color: var(--rc-announce-accent); text-decoration: none; font-weight: 600; }
+.announce-bar a:hover { text-decoration: underline; }
+
+/* Fixed nav — always dark (Orkes pattern) */
 .landing-nav {
   background: var(--rc-nav-bg) !important;
   border-color: var(--rc-nav-border) !important;
   transition: background 0.35s ease, border-color 0.35s ease;
+}
+.landing-nav .rc-nav-link { color: var(--rc-nav-text) !important; }
+.landing-nav .rc-nav-link:hover { color: #ffffff !important; }
+
+/* Hero — dark section ("a shade of dark, not black") */
+.hero-dark {
+  background: var(--rc-hero-bg);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(108,61,181,0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%,  rgba(124,58,237,0.12) 0%, transparent 50%);
+  color: var(--rc-hero-text);
+}
+.hero-dark-dot {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Product panel inside hero — dark card with slight glow */
+.hero-panel {
+  background: var(--rc-hero-surface);
+  border: 1px solid var(--rc-hero-border);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 24px 80px rgba(0,0,0,0.5), 0 0 60px rgba(108,61,181,0.15);
+}
+.hero-panel-header {
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--rc-hero-border);
+  border-radius: 16px 16px 0 0;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hero-panel-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
 }
 
 /* Dot grid — adapts to theme */
